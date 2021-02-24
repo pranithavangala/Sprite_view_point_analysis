@@ -10,7 +10,7 @@ option_list = list(
    make_option(c("-f", "--bedpe"), type="character", default=NULL, 
                help="intercation file as bedpe", metavar="character"),
    make_option(c("-o", "--outputfile"), type="character", default=NULL, 
-               help="List of genes [default= %default]", metavar="character")
+               help="name of the output file ", metavar="character")
 );
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
@@ -62,7 +62,7 @@ s=sample(1:nrow(cis),nrow(cis)*0.2)
 mod_negB=MASS::glm.nb(rawcounts ~ log(coverage_bin1)+log(coverage_bin2)+log(dist),data=cis[s,])
 summary(mod_negB)
 pred_negB=predict(mod_negB,dispersion=1/mod_negB$theta,cis_pp,type="response")
-outliers=(qnbinom(0.7, mu=pred_negB,size=mod_negB$theta))
+outliers=(qnbinom(n, mu=pred_negB,size=mod_negB$theta))
 cis_refit=cis[cis$rawCounts<outliers,]
 
 s=sample(1:nrow(cis_refit),nrow(cis_refit)*0.2)
@@ -76,6 +76,6 @@ cis$OE_NB=cis$rawcounts/cis$pred_negB
 cis$residuals=cis$rawcounts-cis$pred_negB
 cis$logpadj=-log10(round(cis$padj_NB,digits=15))
 colnames(cis)[1]="#chrom_2"
-saveRDS(cis,"all_cis_2MB_NB.rds")
+saveRDS(cis,paste0(out,"_all_cis_2MB_NB.rds"))
 
   
